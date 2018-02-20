@@ -1,0 +1,14 @@
+{
+  "name": "hangman",
+  "version": "0.1.0",
+	"package-specs": ["es6"],
+  "sources": [
+    "src",
+  ],
+	"bsc-flags": [
+		"-bs-super-errors"
+	],
+  "bs-dependencies" : [
+		"bucklescript-tea"
+  ]
+}
