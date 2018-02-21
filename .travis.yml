@@ -1,13 +1,14 @@
 language: node_js
 node_js:
   - "8"
-
+# cache:
+#   directories:
+#     - node_modules/bs-platform
 script: npm run build
-
-# deploy:
-#   provider: pages
-#   skip-cleanup: true
-#   github-token: $GITHUB_TOKEN
-#   keep-history: true
-#   on:
-#     branch: gh-pages
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  keep-history: true
+  on:
+    branch: gh-pages
