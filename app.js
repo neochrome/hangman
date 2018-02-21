@@ -8484,7 +8484,7 @@ function url_from(difficulty) {
     "api_key=9ff1e949883740308250307233602ff096c416b5bccb12451",
     options_001
   ];
-  return "http://api.wordnik.com:80/v4/words.json/randomWord?" + _2($$String$1[/* concat */6], "&", options);
+  return "//api.wordnik.com:80/v4/words.json/randomWord?" + _2($$String$1[/* concat */6], "&", options);
 }
 
 var decode = Decoder[/* field */11]("word", Decoder[/* string */2]);
