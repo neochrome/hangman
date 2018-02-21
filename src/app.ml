@@ -66,7 +66,7 @@ let start_guessing word model =
   }
 
 let url_from difficulty =
-  let base = "//api.wordnik.com:80/v4/words.json/randomWord" in
+  let base = "//api.wordnik.com/v4/words.json/randomWord" in
   let api_key = "api_key=9ff1e949883740308250307233602ff096c416b5bccb12451" in
   let options =
     api_key ::
