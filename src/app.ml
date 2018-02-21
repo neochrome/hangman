@@ -120,7 +120,7 @@ let update model = function
     then model |> guess g |> check_end_of_game
     else model), Cmd.none
   | FetchWord difficulty -> model, fetch_word difficulty
-  | FetchWordDone word -> model |> start_guessing word, Cmd.none
+  | FetchWordDone word -> { model with error = None } |> start_guessing word, Cmd.none
   | FetchWordError error -> { model with error = Some error }, Cmd.none
 
 
@@ -130,11 +130,17 @@ let view_difficulty_choice () =
     button [class' "hard"; onClick (FetchWord Hard)] [text "bring it on!"];
   ]
 
-let view_start () =
+let view_error { error } =
+  match error with
+  | None -> noNode
+  | Some err -> div [class' "error"] [text err]
+
+let view_start model =
   div [class' "start"] [
     text "Try not to be hanged!";
     view_difficulty_choice ();
     Gfx.draw 300 300 0;
+    view_error model;
   ]
 
 let view_letter_button { guesses; } l =
@@ -152,40 +158,42 @@ let view_word { word_letters; guesses; } =
     |> List.map (span [class' "letter"])
   )
 
-
 let view_guessing model =
   div [] [
     view_word model;
-    div [] (
-      letters |> List.map (view_letter_button model)
-    );
+    div [] (letters |> List.map (view_letter_button model));
     model |> bad_guesses |> Gfx.draw 300 300;
+    view_error model;
   ]
 
-let view_game_over model = function
-  | Won -> div [class' "game-over won"] [
-      text "winner!";
-      view_difficulty_choice ();
-    ]
-  | Lost -> div [class' "game-over lost"] [
-      text "loser!";
-      span [class' "word"] [
-        model.word_letters
-        |> String.from_chars
-        |> ( ^ ) "the word was: "
-        |> text
+let view_game_over model result =
+  div [] [
+    view_guessing model;
+    match result with
+    | Won -> div [class' "game-over won"] [
+        text "winner!";
+        view_difficulty_choice ();
+      ]
+    | Lost -> div [class' "game-over lost"] [
+        text "loser!";
+        span [class' "word"] [
+          model.word_letters
+          |> String.from_chars
+          |> ( ^ ) "the word was: "
+          |> text
 
-      ];
-      view_difficulty_choice ();
-    ]
-
+        ];
+        view_difficulty_choice ();
+      ]
+  ]
 
 let view model =
-  div [] <|
+  div [] [
     match model.state with
-    | Start -> [view_start ()]
-    | Guessing -> [view_guessing model]
-    | GameOver result -> [view_guessing model; view_game_over model result]
+    | Start -> view_start model
+    | Guessing -> view_guessing model
+    | GameOver result -> view_game_over model result
+  ]
 
 
 let subscriptions _ =

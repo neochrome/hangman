@@ -22,12 +22,12 @@ end
 module List = struct
   include List
 
-  let contains x = exists (( = ) x)
+  let contains x = exists (( == ) x)
   let except ys = filter (fun x -> not (contains x ys))
   let except_first x =
     let rec loop hs = function
       | [] -> hs
-      | h :: xs when h = x -> xs |> List.rev_append hs
+      | h :: xs when h == x -> xs |> List.rev_append hs
       | h :: xs -> loop (h :: hs) xs
     in loop []
 end
