@@ -35,6 +35,7 @@ type model = {
 }
 
 let init () =
+  Ga.track_view "start";
   {
     state = Start;
     word_letters = [];
@@ -103,15 +104,18 @@ let fetch_word difficulty =
 
 
 let guess g model =
+  Ga.track_event "guessing" "guess" (Char.to_string g);
   let guesses = CharSet.add g model.guesses in
   { model with guesses; }
 
 let check_end_of_game model =
-  if lost model then
+  if lost model then begin
+    Ga.track_view "game-over-lost";
     { model with state = GameOver Lost }
-  else if won model then
+  end else if won model then begin
+    Ga.track_view "game-over-won";
     { model with state = GameOver Won }
-  else
+    end else
     model
 
 let update model = function
@@ -120,9 +124,13 @@ let update model = function
     then model |> guess g |> check_end_of_game
     else model), Cmd.none
   | FetchWord difficulty -> model, fetch_word difficulty
-  | FetchWordDone word -> { model with error = None } |> start_guessing word, Cmd.none
-  | FetchWordError error -> { model with error = Some error }, Cmd.none
-
+  | FetchWordDone word ->
+    Ga.track_view "guessing";
+    Ga.track_event "guessing" "word" word;
+    { model with error = None } |> start_guessing word, Cmd.none
+  | FetchWordError error ->
+    Ga.track_exception error;
+    { model with error = Some error }, Cmd.none
 
 let view_difficulty_choice () =
   div [class' "choose-difficulty"] [
@@ -133,7 +141,8 @@ let view_difficulty_choice () =
 let view_error { error } =
   match error with
   | None -> noNode
-  | Some err -> div [class' "error"] [text err]
+  | Some err ->
+    div [class' "error"] [text err]
 
 let view_start model =
   div [class' "start"] [
@@ -170,11 +179,13 @@ let view_game_over model result =
   div [] [
     view_guessing model;
     match result with
-    | Won -> div [class' "game-over won"] [
+    | Won ->
+      div [class' "game-over won"] [
         text "winner!";
         view_difficulty_choice ();
       ]
-    | Lost -> div [class' "game-over lost"] [
+    | Lost ->
+      div [class' "game-over lost"] [
         text "loser!";
         span [class' "word"] [
           model.word_letters
