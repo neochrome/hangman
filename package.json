@@ -12,7 +12,7 @@
     "watch:js": "rollup -c -w",
     "watch": "WATCHING=1 run-p watch:* serve"
   },
-  "license": "MIT",
+  "license": "Unlicense",
   "devDependencies": {
     "bs-platform": "^2.1.0",
     "bucklescript-tea": "^0.7.1",
